@@ -72,6 +72,12 @@ dependencies {
     implementation"androidx.camera:camera-view:1.2.2"
     //endregion
 
+    //region TensorFlow Lite
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOP'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
+
+    //endregion
+
     implementation 'androidx.activity:activity-ktx:1.7.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

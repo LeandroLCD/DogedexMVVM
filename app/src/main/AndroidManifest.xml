@@ -4,7 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,21 +16,22 @@
         android:theme="@style/Theme.DogedexMVVM"
         tools:targetApi="31">
         <activity
-            android:name=".setting.SettingActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".WholeImageActivity"
             android:exported="false" />
         <activity
+            android:name=".setting.SettingActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".auth.LoginActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".dogdetail.DogDetailActivity"
             android:exported="false" />
         <activity
             android:name=".dogslist.DogListActivity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
