@@ -9,6 +9,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Query
+
 private val httpClient = OkHttpClient
     .Builder()
     .addInterceptor(ApiServiInterceptor)
@@ -37,6 +39,10 @@ interface ApiService{
     @Headers("${ApiServiInterceptor.NEEDS_AUTH_HEADER_KEY}: true")
     @GET("get_user_dogs")
     suspend fun getUserDogs(): DogResponse
+
+    @Headers("${ApiServiInterceptor.NEEDS_AUTH_HEADER_KEY}: true")
+    @GET("find_dog_by_ml_id")
+    suspend fun getDogByMlId(@Query("ml_id") mlId:String): DogMlResponse
 
 }
 

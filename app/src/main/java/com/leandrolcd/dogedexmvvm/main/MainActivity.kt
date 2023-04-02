@@ -1,24 +1,37 @@
-package com.leandrolcd.dogedexmvvm
+package com.leandrolcd.dogedexmvvm.main
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.LABEL_PATH
+import com.leandrolcd.dogedexmvvm.MODEL_PATH
+import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.api.ApiServiInterceptor
+import com.leandrolcd.dogedexmvvm.api.models.isNull
+import com.leandrolcd.dogedexmvvm.api.models.toBitmap
 import com.leandrolcd.dogedexmvvm.auth.LoginActivity
 import com.leandrolcd.dogedexmvvm.auth.model.User
 import com.leandrolcd.dogedexmvvm.databinding.ActivityMainBinding
+import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity
+import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity.Companion.DOG_KEY
+import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity.Companion.IS_RECOGNITION_KEY
 import com.leandrolcd.dogedexmvvm.dogslist.DogListActivity
+import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
 import com.leandrolcd.dogedexmvvm.machinelearning.Classifier
+import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
 import com.leandrolcd.dogedexmvvm.setting.SettingActivity
 import org.tensorflow.lite.support.common.FileUtil
 import java.io.File
@@ -41,7 +54,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutors: ExecutorService
-    private lateinit var classifier:Classifier
+    private val viewModel: MainViewModel by viewModels()
+    private lateinit var classifier: Classifier
     private var isCameraReady = false
     //endregion
 
@@ -64,13 +78,41 @@ class MainActivity : AppCompatActivity() {
         binding.dogListPhotoFab.setOnClickListener {
             openDogListActivity()
         }
-        binding.takePhotoFab.setOnClickListener {
-            if (isCameraReady) {
-                takePhoto()
-            }
 
+        viewModel.status.observe(this) {
+            when (it) {
+                is UiStatus.Error -> {
+                    binding.pbLoading.visibility = View.GONE
+                    Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                }
+                is UiStatus.Loading -> {
+                    binding.pbLoading.visibility = View.VISIBLE
+                    binding.takePhotoFab.alpha = 0.2f
+                    binding.takePhotoFab.setOnClickListener(null)
+                }
+                is UiStatus.Success -> binding.pbLoading.visibility = View.GONE
+            }
         }
+
+        viewModel.dog.observe(this) { dog ->
+            if (!dog.isNull()) {
+                openDogDetailActivity(dog, true)
+            }
+        }
+
+        viewModel.dogRecognition.observe(this){
+            enableTakePhotoButton(it)
+        }
+
         requestCamaraPermission()
+    }
+
+    private fun openDogDetailActivity(dog: Dog, isRecognition:Boolean) {
+        val intent = Intent(this, DogDetailActivity::class.java)
+        intent.putExtra(DOG_KEY, dog)
+        intent.putExtra(IS_RECOGNITION_KEY, isRecognition)
+
+        startActivity(intent)
     }
 
     //region Camera methods
@@ -101,11 +143,8 @@ class MainActivity : AppCompatActivity() {
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
             imageAnalysis.setAnalyzer(cameraExecutors) { imageProxy ->
-                val rotationDegrees = imageProxy.imageInfo.rotationDegrees
-                // insert your code here.
+                viewModel.recognizerImage(imageProxy)
 
-                // after done, release the ImageProxy object
-                imageProxy.close()
             }
             cameraProvider.bindToLifecycle(
                 this,
@@ -115,6 +154,19 @@ class MainActivity : AppCompatActivity() {
                 imageAnalysis
             )
         }, ContextCompat.getMainExecutor(this))
+
+    }
+
+    private fun enableTakePhotoButton(dogRecognition: DogRecognition) {
+        if (dogRecognition.confidence > 70.0) {
+            binding.takePhotoFab.alpha = 1f
+            binding.takePhotoFab.setOnClickListener {
+                viewModel.getDogByMlId(dogRecognition.id)
+            }
+        } else {
+            binding.takePhotoFab.alpha = 0.2f
+            binding.takePhotoFab.setOnClickListener(null)
+        }
 
     }
 
@@ -146,6 +198,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    //region Methods para tomar foto en desUso
+    private fun takePhoto() {
+        val outputFileOptions = ImageCapture.OutputFileOptions.Builder(getOutPutPhotoFile()).build()
+        imageCapture.takePicture(outputFileOptions, cameraExecutors,
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(error: ImageCaptureException) {
+                    Toast.makeText(this@MainActivity, error.message, Toast.LENGTH_LONG).show()
+                }
+
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+//                    val photoUri = outputFileResults.savedUri?.path
+//
+//                    val bitmap = BitmapFactory.decodeFile(photoUri)
+//
+//                    val dogRecognition = classifier.recognizeImage(bitmap).first()
+//
+//                    viewModel.getDogByMlId(dogRecognition.id)
+
+                    // openWholeImageActivity(photoUri ?: "")
+                }
+            })
+    }
+
     private fun getOutPutPhotoFile(): File {
 
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
@@ -162,30 +238,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun takePhoto() {
-        val outputFileOptions = ImageCapture.OutputFileOptions.Builder(getOutPutPhotoFile()).build()
-        imageCapture.takePicture(outputFileOptions, cameraExecutors,
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(error: ImageCaptureException) {
-                    Toast.makeText(this@MainActivity, error.message, Toast.LENGTH_LONG).show()
-                }
-
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val photoUri = outputFileResults.savedUri?.path
-
-                    val bitmap = BitmapFactory.decodeFile(photoUri)
-
-                    classifier.recognizeImage(bitmap)
-
-                    openWholeImageActivity(photoUri ?: "")
-                }
-            })
-    }
-
+    //endregion
     override fun onStart() {
         super.onStart()
-        classifier = Classifier(FileUtil.loadMappedFile(this@MainActivity, MODEL_PATH),
-            FileUtil.loadLabels(this@MainActivity,LABEL_PATH)
+        viewModel.setupClassifier(
+            FileUtil.loadMappedFile(this@MainActivity, MODEL_PATH),
+            FileUtil.loadLabels(this@MainActivity, LABEL_PATH)
         )
     }
 
@@ -198,11 +256,11 @@ class MainActivity : AppCompatActivity() {
     }
     //endregion
 
-    private fun openWholeImageActivity(photoUri: String) {
-        val intent = Intent(this, WholeImageActivity::class.java)
-        intent.putExtra(WholeImageActivity.PHOTO_URI, photoUri)
-        startActivity(intent)
-    }
+//    private fun openWholeImageActivity(photoUri: String) {
+//        val intent = Intent(this, WholeImageActivity::class.java)
+//        intent.putExtra(WholeImageActivity.PHOTO_URI, photoUri)
+//        startActivity(intent)
+//    }
 
     private fun openDogListActivity() {
         startActivity(Intent(this, DogListActivity::class.java))

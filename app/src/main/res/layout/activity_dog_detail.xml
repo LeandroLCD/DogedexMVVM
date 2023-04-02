@@ -280,7 +280,7 @@
             android:src="@drawable/ic_check_black" />
 
         <ProgressBar
-            android:id="@+id/loading_wheel"
+            android:id="@+id/pbLoading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

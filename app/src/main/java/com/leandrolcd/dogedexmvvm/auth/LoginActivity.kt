@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.leandrolcd.dogedexmvvm.MainActivity
+import com.leandrolcd.dogedexmvvm.main.MainActivity
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.auth.model.User
 import com.leandrolcd.dogedexmvvm.databinding.ActivityLoginBinding

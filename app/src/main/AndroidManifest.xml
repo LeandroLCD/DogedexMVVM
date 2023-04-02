@@ -16,24 +16,29 @@
         android:theme="@style/Theme.DogedexMVVM"
         tools:targetApi="31">
         <activity
+            android:name=".DogDetailComposeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_dog_detail_compose"
+            android:theme="@style/Theme.DogedexMVVM" />
+        <activity
             android:name=".WholeImageActivity"
             android:exported="false" />
         <activity
             android:name=".setting.SettingActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
             android:name=".auth.LoginActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".dogdetail.DogDetailActivity"
             android:exported="false" />
         <activity
             android:name=".dogslist.DogListActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".main.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

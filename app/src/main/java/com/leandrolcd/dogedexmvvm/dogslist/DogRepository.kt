@@ -5,6 +5,8 @@ import com.leandrolcd.dogedexmvvm.Dog
 import com.leandrolcd.dogedexmvvm.api.DogsApi.retrofitService
 import com.leandrolcd.dogedexmvvm.api.makeNetworkCall
 import com.leandrolcd.dogedexmvvm.api.models.AddDogToUserDTO
+import com.leandrolcd.dogedexmvvm.api.models.toDog
+import com.leandrolcd.dogedexmvvm.api.models.toDogList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -50,22 +52,7 @@ class DogRepository {
         return makeNetworkCall {
             val response = retrofitService.getUserDogs()
 
-            response.data.dogs.map {
-                Dog(
-                    id = it.id,
-                    index = it.index,
-                    name = it.nameEs,
-                    type = it.dogType,
-                    temperament = it.temperament,
-                    heightFemale = it.heightFemale,
-                    heightMale = it.heightMale,
-                    weightFemale = it.weightFemale,
-                    weightMale = it.weightMale,
-                    lifeExpectancy = it.lifeExpectancy,
-                    imageUrl = it.imageUrl
-                )
-
-            }
+            response.data.dogs.toDogList()
 
         }
     }
@@ -73,22 +60,7 @@ class DogRepository {
     suspend fun downloadDogs(): UiStatus<List<Dog>> {
         return makeNetworkCall {
             val response = retrofitService.getAllDogs()
-            response.data.dogs.map {
-                Dog(
-                    id = it.id,
-                    index = it.index,
-                    name = it.nameEs,
-                    type = it.dogType,
-                    temperament = it.temperament,
-                    heightFemale = it.heightFemale,
-                    heightMale = it.heightMale,
-                    weightFemale = it.weightFemale,
-                    weightMale = it.weightMale,
-                    lifeExpectancy = it.lifeExpectancy,
-                    imageUrl = it.imageUrl
-                )
-
-            }
+            response.data.dogs.toDogList()
 
         }
 
@@ -104,5 +76,13 @@ class DogRepository {
         }
     }
 
-
+    suspend fun getDogByMlId(mlDogId: String):UiStatus<Dog>{
+        return makeNetworkCall {
+            val response = retrofitService.getDogByMlId(mlDogId)
+            if (!response.isSuccess) {
+                throw Exception(response.message)
+            }
+            response.data.dog.toDog()
+        }
+    }
 }
