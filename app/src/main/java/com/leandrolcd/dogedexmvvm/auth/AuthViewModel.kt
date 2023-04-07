@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leandrolcd.dogedexmvvm.auth.model.User
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {

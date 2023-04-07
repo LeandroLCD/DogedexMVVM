@@ -14,30 +14,34 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.content.ContextCompat
-import com.leandrolcd.dogedexmvvm.Dog
+import coil.annotation.ExperimentalCoilApi
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.LABEL_PATH
 import com.leandrolcd.dogedexmvvm.MODEL_PATH
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.api.ApiServiInterceptor
 import com.leandrolcd.dogedexmvvm.api.models.isNull
-import com.leandrolcd.dogedexmvvm.api.models.toBitmap
 import com.leandrolcd.dogedexmvvm.auth.LoginActivity
 import com.leandrolcd.dogedexmvvm.auth.model.User
 import com.leandrolcd.dogedexmvvm.databinding.ActivityMainBinding
-import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity
-import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity.Companion.DOG_KEY
-import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity.Companion.IS_RECOGNITION_KEY
-import com.leandrolcd.dogedexmvvm.dogslist.DogListActivity
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailComposeActivity
+import com.leandrolcd.dogedexmvvm.dogslist.DogListComposeActivity
 import com.leandrolcd.dogedexmvvm.machinelearning.Classifier
 import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
 import com.leandrolcd.dogedexmvvm.setting.SettingActivity
+import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeActivity
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 import org.tensorflow.lite.support.common.FileUtil
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@ExperimentalMaterial3Api
+@ExperimentalMaterialApi
+@ExperimentalCoilApi
 @Suppress("IMPLICIT_CAST_TO_ANY")
 class MainActivity : AppCompatActivity() {
     //region Fields
@@ -67,7 +71,8 @@ class MainActivity : AppCompatActivity() {
         val user = User.getLoggedInUser(this)
 
         if (user == null) {
-            openLogin()
+            //openLogin()
+            startActivity(Intent(this, LoginComposeActivity::class.java))
             return
         }
         ApiServiInterceptor.setSessionToken(user.authenticationToken)
@@ -91,6 +96,7 @@ class MainActivity : AppCompatActivity() {
                     binding.takePhotoFab.setOnClickListener(null)
                 }
                 is UiStatus.Success -> binding.pbLoading.visibility = View.GONE
+                else -> {}
             }
         }
 
@@ -108,9 +114,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openDogDetailActivity(dog: Dog, isRecognition:Boolean) {
-        val intent = Intent(this, DogDetailActivity::class.java)
-        intent.putExtra(DOG_KEY, dog)
-        intent.putExtra(IS_RECOGNITION_KEY, isRecognition)
+        val intent = Intent(this, DogDetailComposeActivity::class.java)
+        intent.putExtra(DogDetailComposeActivity.DOG_KEY, dog)
+        intent.putExtra(DogDetailComposeActivity.IS_RECOGNITION_KEY, isRecognition)
 
         startActivity(intent)
     }
@@ -263,7 +269,7 @@ class MainActivity : AppCompatActivity() {
 //    }
 
     private fun openDogListActivity() {
-        startActivity(Intent(this, DogListActivity::class.java))
+        startActivity(Intent(this, DogListComposeActivity::class.java))
     }
 
     private fun openSettingActivity() {

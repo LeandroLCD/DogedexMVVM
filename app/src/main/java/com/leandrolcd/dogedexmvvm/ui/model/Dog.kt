@@ -1,4 +1,4 @@
-package com.leandrolcd.dogedexmvvm
+package com.leandrolcd.dogedexmvvm.ui.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

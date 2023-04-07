@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.databinding.DocListItemBinding
 

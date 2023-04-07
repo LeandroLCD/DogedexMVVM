@@ -8,11 +8,13 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import coil.annotation.ExperimentalCoilApi
 import com.leandrolcd.dogedexmvvm.databinding.ActivityDogListBinding
-import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity
-import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailActivity.Companion.DOG_KEY
+import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailComposeActivity
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 
 private const val GRID_SPAN_COLUMN = 3
+@ExperimentalCoilApi
 class DogListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: DogListViewModel by viewModels()
@@ -27,8 +29,8 @@ class DogListActivity : AppCompatActivity() {
         val adapter = DogAdapter() // crea el adapter
         adapter.setOnItemClickListener {
             //pasar el obj dog al detalle
-            val intent = Intent(this, DogDetailActivity::class.java) // crea el intent
-            intent.putExtra(DOG_KEY, it) // agrega el obj dog con key
+            val intent = Intent(this, DogDetailComposeActivity::class.java) // crea el intent
+            intent.putExtra(DogDetailComposeActivity.DOG_KEY, it) // agrega el obj dog con key
             startActivity(intent) //lanza el nuevo evento
         }
         recycler.adapter = adapter // setea el adapter el recycler view
@@ -44,6 +46,7 @@ class DogListActivity : AppCompatActivity() {
                 }
                 is UiStatus.Loading -> pbLoading.visibility = View.VISIBLE
                 is UiStatus.Success -> pbLoading.visibility = View.GONE
+                else -> {}
             }
 
         }

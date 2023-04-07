@@ -3,7 +3,8 @@ package com.leandrolcd.dogedexmvvm.api.models
 import android.annotation.SuppressLint
 import android.graphics.*
 import androidx.camera.core.ImageProxy
-import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.data.model.DogDTO
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import java.io.ByteArrayOutputStream
 
 fun DogDTO.toDog(): Dog {
@@ -21,6 +22,30 @@ fun DogDTO.toDog(): Dog {
         heightMale = this.heightMale,
         heightFemale = this.heightFemale,
     )
+
+    }
+}
+
+fun Dog.toDogTDO(): DogDTO {
+    return  this.run {
+        DogDTO(
+            id = this.id,
+            index = this.index,
+            imageUrl = this.imageUrl,
+            lifeExpectancy  = this.lifeExpectancy,
+            nameEs = this.name,
+            temperament = this.temperament,
+            dogType = this.type,
+            weightMale  = this.weightMale,
+            weightFemale = this.weightFemale,
+            heightMale = this.heightMale,
+            heightFemale = this.heightFemale,
+            createdAt = "",
+            nameEn = this.name,
+            temperamentEn = this.temperament,
+            updatedAt = "",
+            mlId = ""
+        )
 
     }
 }
@@ -46,7 +71,7 @@ fun List<DogDTO>.toDogList():List<Dog>{
 
 fun Any.isNull():Boolean = this == null
 
-@SuppressLint("UnsafeOptInUsageError")
+
 fun ImageProxy.toBitmap(): Bitmap? {
  if(this == null) return null
 

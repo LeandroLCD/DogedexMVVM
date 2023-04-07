@@ -1,17 +1,21 @@
 package com.leandrolcd.dogedexmvvm.dogslist
 
 
-import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.api.DogsApi.retrofitService
 import com.leandrolcd.dogedexmvvm.api.makeNetworkCall
 import com.leandrolcd.dogedexmvvm.api.models.AddDogToUserDTO
 import com.leandrolcd.dogedexmvvm.api.models.toDog
 import com.leandrolcd.dogedexmvvm.api.models.toDogList
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 
 class DogRepository {
+    init {
+
+}
 
     suspend fun getDogCollection(): UiStatus<List<Dog>> {
 
@@ -26,6 +30,9 @@ class DogRepository {
             } else if (dogUser is UiStatus.Error) {
                 dogUser
             } else if(dogUser is UiStatus.Success && allDog is UiStatus.Success){
+//                for(dog in dogUser.data){
+//                    val resp = repo(dog)
+//                }
 
                 UiStatus.Success(getCollectionList(allDog.data, dogUser.data))
             }
@@ -76,7 +83,7 @@ class DogRepository {
         }
     }
 
-    suspend fun getDogByMlId(mlDogId: String):UiStatus<Dog>{
+    suspend fun getDogByMlId(mlDogId: String): UiStatus<Dog> {
         return makeNetworkCall {
             val response = retrofitService.getDogByMlId(mlDogId)
             if (!response.isSuccess) {

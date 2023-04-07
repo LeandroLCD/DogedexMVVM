@@ -6,13 +6,17 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.findNavController
 import com.leandrolcd.dogedexmvvm.main.MainActivity
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.auth.model.User
 import com.leandrolcd.dogedexmvvm.databinding.ActivityLoginBinding
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 
+@ExperimentalMaterialApi
+@ExperimentalMaterial3Api
 class LoginActivity : AppCompatActivity(), LoginFragment.LoginFragmentActions,
     SignUpFragment.SignUpFragmentActions {
 
@@ -31,6 +35,7 @@ class LoginActivity : AppCompatActivity(), LoginFragment.LoginFragmentActions,
                 }
                 is UiStatus.Loading -> binding.loadingWheel.visibility = View.VISIBLE
                 is UiStatus.Success -> binding.loadingWheel.visibility = View.GONE
+                else -> {}
             }
         }
 

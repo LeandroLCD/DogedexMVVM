@@ -1,4 +1,4 @@
-package com.leandrolcd.dogedexmvvm.api.models
+package com.leandrolcd.dogedexmvvm.data.model
 
 
 import com.google.gson.annotations.SerializedName

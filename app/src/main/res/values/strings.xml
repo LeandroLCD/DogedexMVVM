@@ -31,4 +31,9 @@
     <string name="dog_image">Dog Image</string>
     <string name="logout">Logout</string>
     <string name="title_activity_dog_detail_compose">DogDetailComposeActivity</string>
+    <string name="error_dialog_confirButton">Reintentar</string>
+    <string name="error_dialog_title">Error</string>
+    <string name="title_activity_dog_list_compose">DogListComposeActivity</string>
+    <string name="title_top_bar">My Collection Dog</string>
+    <string name="title_activity_login">LoginActivity</string>
 </resources>

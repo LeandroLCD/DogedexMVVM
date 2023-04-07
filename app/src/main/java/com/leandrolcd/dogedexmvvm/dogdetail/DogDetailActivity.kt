@@ -8,10 +8,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import coil.load
-import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.databinding.ActivityDogDetailBinding
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 
 class DogDetailActivity : AppCompatActivity() {
     companion object {
@@ -62,6 +62,7 @@ class DogDetailActivity : AppCompatActivity() {
                     Toast.makeText(this, "!Felicidades has conseguido agregar un ${dog.name}, a tu colección!!!", Toast.LENGTH_LONG).show()
                     finish()
                 }
+                else -> {}
             }
 
         }

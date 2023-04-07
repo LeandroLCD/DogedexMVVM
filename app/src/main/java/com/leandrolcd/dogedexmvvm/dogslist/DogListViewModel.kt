@@ -1,11 +1,13 @@
 package com.leandrolcd.dogedexmvvm.dogslist
 
-import android.util.Log
+
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 import kotlinx.coroutines.launch
 
 class DogListViewModel : ViewModel() {
@@ -14,9 +16,16 @@ class DogListViewModel : ViewModel() {
 
     val dogList: LiveData<List<Dog>> = _dogList
 
+    var dogComposeList = mutableStateOf<List<Dog>>(listOf())
+        private set
+    var statusCompose = mutableStateOf<UiStatus<Any>?>(null)
+        private set
+
     private val _status = MutableLiveData<UiStatus<Any>>()
 
     val status: LiveData<UiStatus<Any>> = _status
+
+
 
     private val repository = DogRepository()
 
@@ -38,7 +47,9 @@ class DogListViewModel : ViewModel() {
     private fun handleResponseStatus(uiStatus: UiStatus<List<Dog>>) {
         if (uiStatus is UiStatus.Success) {
             _dogList.value = uiStatus.data!!
+            dogComposeList.value = uiStatus.data!!
         }
+        statusCompose.value = uiStatus as UiStatus<Any>
         _status.value = uiStatus as UiStatus<Any>
     }
 

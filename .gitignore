@@ -2,7 +2,7 @@
 *.apk
 *.ap_
 *.aab
-
+*.json
 # files for the dex VM
 *.dex
 

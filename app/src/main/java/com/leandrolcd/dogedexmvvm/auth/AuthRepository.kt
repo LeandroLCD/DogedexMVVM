@@ -7,7 +7,7 @@ import com.leandrolcd.dogedexmvvm.api.models.SignInDTO
 import com.leandrolcd.dogedexmvvm.api.models.SignUpDTO
 import com.leandrolcd.dogedexmvvm.api.models.UserDTO
 import com.leandrolcd.dogedexmvvm.auth.model.User
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 
 class AuthRepository {
 

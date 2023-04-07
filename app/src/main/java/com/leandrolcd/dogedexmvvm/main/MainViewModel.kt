@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.leandrolcd.dogedexmvvm.Dog
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.dogslist.DogRepository
-import com.leandrolcd.dogedexmvvm.dogslist.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
 import com.leandrolcd.dogedexmvvm.machinelearning.Classifier
 import com.leandrolcd.dogedexmvvm.machinelearning.ClassifierRepository
 import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
