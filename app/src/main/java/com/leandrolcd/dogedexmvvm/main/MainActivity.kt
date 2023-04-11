@@ -18,22 +18,21 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.content.ContextCompat
 import coil.annotation.ExperimentalCoilApi
-import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.LABEL_PATH
 import com.leandrolcd.dogedexmvvm.MODEL_PATH
 import com.leandrolcd.dogedexmvvm.R
-import com.leandrolcd.dogedexmvvm.api.ApiServiInterceptor
 import com.leandrolcd.dogedexmvvm.api.models.isNull
 import com.leandrolcd.dogedexmvvm.auth.LoginActivity
-import com.leandrolcd.dogedexmvvm.auth.model.User
 import com.leandrolcd.dogedexmvvm.databinding.ActivityMainBinding
 import com.leandrolcd.dogedexmvvm.dogdetail.DogDetailComposeActivity
 import com.leandrolcd.dogedexmvvm.dogslist.DogListComposeActivity
-import com.leandrolcd.dogedexmvvm.machinelearning.Classifier
+import com.leandrolcd.dogedexmvvm.core.camera.Classifier
 import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
 import com.leandrolcd.dogedexmvvm.setting.SettingActivity
 import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeActivity
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
+import dagger.hilt.android.AndroidEntryPoint
 import org.tensorflow.lite.support.common.FileUtil
 import java.io.File
 import java.util.concurrent.ExecutorService
@@ -43,6 +42,7 @@ import java.util.concurrent.Executors
 @ExperimentalMaterialApi
 @ExperimentalCoilApi
 @Suppress("IMPLICIT_CAST_TO_ANY")
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     //region Fields
     private val requestPermissionLauncher =
@@ -59,7 +59,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutors: ExecutorService
     private val viewModel: MainViewModel by viewModels()
-    private lateinit var classifier: Classifier
     private var isCameraReady = false
     //endregion
 
@@ -68,15 +67,14 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val user = User.getLoggedInUser(this)
 
-        if (user == null) {
-            //openLogin()
+        if (viewModel.userCurrent.value?.uid == null) {
+
             startActivity(Intent(this, LoginComposeActivity::class.java))
-            return
+            finish()
+        }else{
+            Log.d("TAG", "onCreate: ${viewModel.userCurrent.value?.uid }")
         }
-        ApiServiInterceptor.setSessionToken(user.authenticationToken)
-        Log.i("user", user.toString())
         binding.settingFab.setOnClickListener {
             openSettingActivity()
         }
@@ -145,7 +143,6 @@ class MainActivity : AppCompatActivity() {
 
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             val imageAnalysis = ImageAnalysis.Builder()
-
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
             imageAnalysis.setAnalyzer(cameraExecutors) { imageProxy ->

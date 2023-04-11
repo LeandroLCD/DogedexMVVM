@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
@@ -12,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.backGroudColor
@@ -20,7 +23,8 @@ import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.textColor
 
 @Composable
-fun myButton(label: String, isButtonEnabled: Boolean, onClickSignUp: () -> Unit) {
+fun MyButton(label: String, isButtonEnabled: Boolean, onClickSignUp: () -> Unit) {
+
     Button(
         onClick = { onClickSignUp() },
         modifier = Modifier.width(150.dp),
@@ -47,18 +51,21 @@ fun MyIcon(image: ImageVector) {
 }
 
 @Composable
-fun TextFields(
+fun EmailFields(
     label: String,
     text: String,
     onValueChange: (String) -> Unit,
     icons: @Composable () -> Unit,
-    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     TextField(
         placeholder = { Text(text = label, color = textColor) }, value = text,
         onValueChange = { onValueChange(it) },
-        visualTransformation = visualTransformation,
         leadingIcon = icons,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next
+        ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = textColor,
             disabledLabelColor = Color.Gray,
@@ -84,6 +91,7 @@ fun PasswordFields(
     text: String,
     onValueChange: (String) -> Unit,
     icons: @Composable () -> Unit,
+    action:ImeAction = ImeAction.Done,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     var passwordVisibility by remember {
@@ -100,6 +108,11 @@ fun PasswordFields(
         } else {
             visualTransformation
         },
+
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = action
+        ),
         leadingIcon = icons,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = textColor,

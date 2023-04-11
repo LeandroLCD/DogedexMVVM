@@ -1,7 +1,8 @@
-package com.leandrolcd.dogedexmvvm.machinelearning
+package com.leandrolcd.dogedexmvvm.core.camera
 
 import android.graphics.Bitmap
 import com.leandrolcd.dogedexmvvm.MAX_RECOGNITION_DOG_RESULTS
+import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.TensorProcessor
 import org.tensorflow.lite.support.common.ops.DequantizeOp
@@ -12,8 +13,10 @@ import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.nio.MappedByteBuffer
 import java.util.*
+import javax.inject.Inject
 
-class Classifier(tfLiteModel: MappedByteBuffer, private val labels: List<String>) {
+class Classifier @Inject constructor(private val tfLiteModel: MappedByteBuffer,
+                 private val labels: List<String>) {
     /**
      * Image size along the x axis.
      */

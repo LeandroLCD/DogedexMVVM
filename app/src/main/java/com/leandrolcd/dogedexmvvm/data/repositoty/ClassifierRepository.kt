@@ -1,13 +1,18 @@
-package com.leandrolcd.dogedexmvvm.machinelearning
+package com.leandrolcd.dogedexmvvm.data.repositoty
 
 import androidx.camera.core.ImageProxy
 import com.leandrolcd.dogedexmvvm.api.models.toBitmap
+import com.leandrolcd.dogedexmvvm.core.camera.Classifier
+import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+ interface IClassifierRepository{
+     suspend fun recognizeImage(imageProxy: ImageProxy): DogRecognition
+ }
+class ClassifierRepository @Inject constructor (private val classifier: Classifier): IClassifierRepository {
 
-class ClassifierRepository(private val classifier:Classifier) {
-
-    suspend fun recognizeImage(imageProxy: ImageProxy):DogRecognition{
+    override suspend fun recognizeImage(imageProxy: ImageProxy): DogRecognition {
         return withContext(Dispatchers.IO){
             imageProxy.imageInfo.rotationDegrees
             val bitmap = imageProxy.toBitmap()

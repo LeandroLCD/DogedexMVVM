@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DogListViewModel : ViewModel() {
@@ -27,7 +28,7 @@ class DogListViewModel : ViewModel() {
 
 
 
-    private val repository = DogRepository()
+    private val repository = DogRepository(Dispatchers.IO)
 
     init {
         collectionDogs()
@@ -46,10 +47,8 @@ class DogListViewModel : ViewModel() {
     @Suppress("UNCHECKED_CAST")
     private fun handleResponseStatus(uiStatus: UiStatus<List<Dog>>) {
         if (uiStatus is UiStatus.Success) {
-            _dogList.value = uiStatus.data!!
-            dogComposeList.value = uiStatus.data!!
+           // _dogList.value = uiStatus.data ?: listOf<Dog>()
         }
-        statusCompose.value = uiStatus as UiStatus<Any>
         _status.value = uiStatus as UiStatus<Any>
     }
 

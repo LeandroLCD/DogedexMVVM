@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leandrolcd.dogedexmvvm.dogslist.DogRepository
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DogDetailViewModel: ViewModel() {
@@ -20,7 +21,7 @@ class DogDetailViewModel: ViewModel() {
 
     val status: LiveData<UiStatus<Any>> = _status
 
-    private val repository = DogRepository()
+    private val repository = DogRepository(Dispatchers.IO)
     //endregion
 
     fun addDogToUser(dogId:Long){

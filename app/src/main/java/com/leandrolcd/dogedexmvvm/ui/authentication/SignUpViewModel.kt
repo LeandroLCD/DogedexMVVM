@@ -1,7 +1,5 @@
 package com.leandrolcd.dogedexmvvm.ui.authentication
 
-import android.content.Context
-import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -59,4 +57,8 @@ class SignUpViewModel @Inject constructor(
 
         }
     }
+    fun TryAgain(){
+        uiStatus.value = UiStatus.Loaded()
+    }
+
 }

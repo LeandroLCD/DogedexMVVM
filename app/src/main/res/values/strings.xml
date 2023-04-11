@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Dogedex</string>
     <string name="female">Female</string>
     <string name="weight">Weight</string>
@@ -36,4 +36,5 @@
     <string name="title_activity_dog_list_compose">DogListComposeActivity</string>
     <string name="title_top_bar">My Collection Dog</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="server_client_id" tools:ignore="TypographyDashes">920293101468-534pgc84fvcqh30pude095p1eej9fs0d.apps.googleusercontent.com</string>
 </resources>

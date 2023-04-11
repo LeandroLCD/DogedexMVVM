@@ -1,25 +1,23 @@
 package com.leandrolcd.dogedexmvvm.dogslist
 
 
-import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.api.DogsApi.retrofitService
 import com.leandrolcd.dogedexmvvm.api.makeNetworkCall
 import com.leandrolcd.dogedexmvvm.api.models.AddDogToUserDTO
 import com.leandrolcd.dogedexmvvm.api.models.toDog
 import com.leandrolcd.dogedexmvvm.api.models.toDogList
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
-import kotlinx.coroutines.Dispatchers
+import com.leandrolcd.dogedexmvvm.ui.model.Dog
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class DogRepository {
-    init {
-
-}
+class  DogRepository @Inject constructor(private val dispatcher: CoroutineDispatcher) {
 
     suspend fun getDogCollection(): UiStatus<List<Dog>> {
 
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcher) {
             val allDogDeferred = async { downloadDogs() }
             val dogUserDeferred = async { getUserDogs() }
 

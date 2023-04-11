@@ -1,7 +1,5 @@
-package com.leandrolcd.dogedexmvvm.ui.authentication
+package com.leandrolcd.dogedexmvvm.ui.authentication.utilities
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -16,12 +14,12 @@ import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.SyncProblem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -36,9 +34,9 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.leandrolcd.dogedexmvvm.R
-import com.leandrolcd.dogedexmvvm.main.MainActivity
-import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.*
+import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
+import kotlinx.coroutines.delay
 import kotlin.math.floor
 
 
@@ -46,12 +44,11 @@ import kotlin.math.floor
 @ExperimentalMaterial3Api
 @Composable
 fun LoginScreen(
-    viewModel: LoginComposeViewModel,
     navigationController: NavHostController,
+    viewModel: LoginComposeViewModel,
     onLoginWithGoogleClicked: () -> Unit
 ) {
 
-    val activity = LocalContext.current as Activity
     when(val status =viewModel.uiStatus.value){
         is UiStatus.Error -> {
             ErrorLoginScreen(status.message){viewModel.onTryAgain()}
@@ -60,39 +57,42 @@ fun LoginScreen(
             LoginContent(viewModel, navigationController, onLoginWithGoogleClicked)
         }
         is UiStatus.Loading -> {
-            LoadingScreen()
+            GifScreen(R.drawable.ic_loading)
         }
         is UiStatus.Success -> {
-            activity.startActivity(Intent(activity, MainActivity::class.java))
-            activity.finish()
+            LaunchedEffect(true) {
+                delay(1000)
+                navigationController.popBackStack()
+                navigationController.navigate(Routes.ScreamCamera.route)
+            }
         }
     }
 
 
 }
 
+
 @Composable
-fun LoadingScreen() {
+fun GifScreen(drawable: Int) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
         Log.d("LoadingScreen", "LoadingScreen: $SDK_INT")
         val imageLoader = ImageLoader.Builder(LocalContext.current)
             .components {
                 if (SDK_INT >= 28) {
-                    Log.d("LoadingScreen", "LoadingScreen2: $SDK_INT")
                     add(ImageDecoderDecoder.Factory())
                 } else {
                     add(GifDecoder.Factory())
                 }
             }
             .build()
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
             Image(
-                painter = rememberAsyncImagePainter(R.drawable.ic_loading, imageLoader),
+                painter = rememberAsyncImagePainter(drawable, imageLoader),
                 contentDescription = null,
-
-                modifier = Modifier.scale(2f)
-                    .background(Color.Red).padding(bottom = 16.dp)
-            )
+                modifier = Modifier
+                    .fillMaxSize()
+                )
             LinearProgressIndicator()
             if(SDK_INT<28){
                 LinearProgressIndicator()
@@ -113,12 +113,12 @@ fun LoginContent(
             .fillMaxSize()
             .background(primaryColor)
     ) {
-        myCardLogin(viewModel, navigationController, onLoginWithGoogleClicked)
+        MyCardLogin(viewModel, navigationController, onLoginWithGoogleClicked)
     }
 }
 
 @Composable
-fun myCardLogin(
+fun MyCardLogin(
     viewModel: LoginComposeViewModel,
     navigationController: NavHostController,
     onLoginWithGoogleClicked: () -> Unit
@@ -146,7 +146,7 @@ fun myCardLogin(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            myHeader()
+            MyHeader()
             BodyLogin(viewModel)
             FooterLogin(viewModel, navigationController, onLoginWithGoogleClicked)
         }
@@ -166,7 +166,7 @@ fun FooterLogin(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            myButton(label = "Sign In", viewModel.isButtonEnabled.value) {
+            MyButton(label = "Sign In", viewModel.isButtonEnabled.value) {
                 viewModel.onLoginClicked()
             }
             LoginWithGoogle(Modifier) {
@@ -191,7 +191,7 @@ fun BodyLogin(viewModel: LoginComposeViewModel) {
             .fillMaxWidth()
     ) {
 
-        TextFields(
+        EmailFields(
             label = "Email",
             text = email,
             icons = { MyIcon(Icons.Default.Email) },
@@ -258,13 +258,13 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
     ) {
         Row {
 
-            myDivider(
+            MyDivider(
                 Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .align(CenterVertically))
             Text("Or")
-            myDivider(
+            MyDivider(
                 Modifier
                     .weight(1f)
                     .padding(start = 8.dp)
@@ -286,7 +286,7 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
 }
 
 @Composable
-fun myDivider(modifier: Modifier = Modifier) {
+fun MyDivider(modifier: Modifier = Modifier) {
     Divider(
         color = Color.Gray,
         thickness = 1.dp,
@@ -294,6 +294,7 @@ fun myDivider(modifier: Modifier = Modifier) {
             .padding(vertical = 4.dp)
     )
 }
+
 
 
 //endregion
