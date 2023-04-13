@@ -27,6 +27,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.ui.authentication.SignUpViewModel
+import com.leandrolcd.dogedexmvvm.ui.model.Routes
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
 import kotlinx.coroutines.delay
 import kotlin.math.floor

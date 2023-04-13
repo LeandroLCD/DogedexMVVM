@@ -18,20 +18,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import coil.annotation.ExperimentalCoilApi
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.LoginScreen
-import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.Routes
+import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.SignUpScreen
-import com.leandrolcd.dogedexmvvm.ui.main.CameraScream
+import com.leandrolcd.dogedexmvvm.ui.camera.CameraScream
+import com.leandrolcd.dogedexmvvm.ui.dogdetail.DogDetailScreen
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.DogedexMVVMTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+@ExperimentalCoilApi
 @ExperimentalMaterialApi
 @ExperimentalMaterial3Api
 @AndroidEntryPoint
@@ -83,6 +88,19 @@ class LoginComposeActivity : ComponentActivity() {
             composable(route = Routes.ScreenSignUp.route) { SignUpScreen(navigationController) }
 
             composable(route = Routes.ScreamCamera.route) { CameraScream(navigationController) }
+
+            composable(
+                Routes.ScreenDogDetail.route,
+                arguments = listOf(navArgument("isRecognition") { type = NavType.BoolType },
+                    navArgument("dogId") { defaultValue = "" })
+            ) {
+                    backStackEntry ->
+                DogDetailScreen(
+                    navigationController = navigationController,
+                    backStackEntry.arguments?.getBoolean("isRecognition", false)!!,
+                    backStackEntry.arguments?.getString("dogId")!!
+                )
+            }
         }
 
     }

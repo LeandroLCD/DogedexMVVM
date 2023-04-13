@@ -1,4 +1,4 @@
-package com.leandrolcd.dogedexmvvm.ui.authentication.utilities
+package com.leandrolcd.dogedexmvvm.ui.model
 
 sealed class UiStatus<T>() {
 

@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.leandrolcd.dogedexmvvm.domain.SignUpUseCase
-import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.model.LoginUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

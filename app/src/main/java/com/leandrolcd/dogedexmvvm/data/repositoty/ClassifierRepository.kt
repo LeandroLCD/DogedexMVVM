@@ -1,9 +1,9 @@
 package com.leandrolcd.dogedexmvvm.data.repositoty
 
 import androidx.camera.core.ImageProxy
-import com.leandrolcd.dogedexmvvm.api.models.toBitmap
+import com.leandrolcd.dogedexmvvm.api.models.rotate
 import com.leandrolcd.dogedexmvvm.core.camera.Classifier
-import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -21,7 +21,7 @@ class ClassifierRepository @Inject constructor (private val classifier: Classifi
 
             }
             else{
-                classifier.recognizeImage(bitmap).first()
+                classifier.recognizeImage(bitmap.rotate()).first()
             }
         }
 

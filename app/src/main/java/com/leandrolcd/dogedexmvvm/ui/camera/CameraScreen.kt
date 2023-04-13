@@ -1,6 +1,11 @@
-package com.leandrolcd.dogedexmvvm.ui.main
+package com.leandrolcd.dogedexmvvm.ui.camera
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.view.Surface.*
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
@@ -22,14 +27,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.ViewCompat.getDisplay
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.leandrolcd.dogedexmvvm.getCameraProvider
-import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
 import com.leandrolcd.dogedexmvvm.opacity
+import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.backGroudColor
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
 
+@RequiresApi(Build.VERSION_CODES.R)
 @ExperimentalMaterial3Api
 @SuppressLint("RestrictedApi", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -57,7 +65,7 @@ fun CameraScream(
 
     }
 
-    val preview = Preview.Builder().build()
+    val preview = Preview.Builder().setTargetRotation(ROTATION_270).build()
 
     val lensFacing = CameraSelector.LENS_FACING_BACK
 
@@ -96,9 +104,10 @@ fun MyScaffolf(
         bottomBar = { MyButtonNavigation(navigationController) },
         floatingActionButton = {
             MyFab(dogRecognition.confidence > 70) {
-                viewModel.getDogByMlId(
-                    dogRecognition.id
-                )
+                navigationController.navigate(Routes.ScreenDogDetail.routeName(
+                    true,
+                    dogRecognition.id,
+                ))
             }
         },
         floatingActionButtonPosition = FabPosition.Center,

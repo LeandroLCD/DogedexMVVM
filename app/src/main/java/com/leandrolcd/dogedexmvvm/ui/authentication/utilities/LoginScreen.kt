@@ -35,6 +35,8 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeViewModel
+import com.leandrolcd.dogedexmvvm.ui.model.Routes
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
 import kotlinx.coroutines.delay
 import kotlin.math.floor

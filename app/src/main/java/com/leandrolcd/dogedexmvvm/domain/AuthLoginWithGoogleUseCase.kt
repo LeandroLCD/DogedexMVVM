@@ -1,7 +1,7 @@
 package com.leandrolcd.dogedexmvvm.domain
 
 import com.leandrolcd.dogedexmvvm.data.repositoty.LoginRepository
-import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import javax.inject.Inject
 
 class AuthLoginWithGoogleUseCase @Inject constructor(

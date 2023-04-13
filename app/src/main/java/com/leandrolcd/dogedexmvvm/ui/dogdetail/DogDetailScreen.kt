@@ -1,6 +1,7 @@
-package com.leandrolcd.dogedexmvvm.controls
+package com.leandrolcd.dogedexmvvm.ui.dogdetail
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,84 +21,88 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.SubcomposeAsyncImage
 import com.leandrolcd.dogedexmvvm.ui.model.Dog
 import com.leandrolcd.dogedexmvvm.R
-import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.UiStatus
+import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.GifScreen
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 
 @ExperimentalCoilApi
 @Composable
-fun DogDetailScreen(dog: Dog,
-                    status: UiStatus<Any>? = UiStatus.Loading(),
-                    onClickAction:()->Unit,
-                    onErrorDialogDismiss:()->Unit)
+fun DogDetailScreen(navigationController: NavHostController, isRecognition: Boolean,dogId: String, viewModel: DogDetailViewModel = hiltViewModel())
 {
-    Box(
-        modifier = Modifier
-            .background(Color.Gray)
-            .fillMaxSize()
-            .padding(horizontal = 8.dp, vertical = 16.dp),
-        contentAlignment = Alignment.TopCenter
-    ) {
 
-        DogInformation(dog, status)
-        SubcomposeAsyncImage(
-            model = dog.imageUrl,
-            loading = {
-                Box(contentAlignment = Alignment.Center){
-                    CircularProgressIndicator(modifier = Modifier
-                        .height(45.dp)
-                        .width(45.dp))
-                }
-            },
-            contentDescription = "Dog image",
-            modifier = Modifier
-                .width(200.dp)
-                .height(200.dp)
-                .padding(top = 40.dp)
-        )
-        if(status is UiStatus.Error){
-            ErrorDialog(status = status,) {
-                onErrorDialogDismiss()
-            }
+
+val status = viewModel.uiStatus
+    when(status.value){
+        is UiStatus.Error -> {
+            Log.d("TAG", "DogDetailScreen: ${(status.value as UiStatus.Error<Dog>).message}")
         }
-
-        FloatingActionButton(
-            onClick = {
-                onClickAction()
-                      },
-            modifier = Modifier.align(Alignment.BottomCenter),
-            backgroundColor = Color.Blue
-        ) {
-            Icon(imageVector = Icons.Filled.Check, contentDescription = "")
+        is UiStatus.Loaded -> {
+            Log.d("TAG", "DogDetailScreen: Loaded")
+            viewModel.getDogById(dogId)
         }
-
-
-
+        is UiStatus.Loading -> {
+            Log.d("TAG", "DogDetailScreen: Loading")
+            GifScreen(R.drawable.ic_loading)
+        }
+        is UiStatus.Success -> {
+            Log.d("TAG", "DogDetailScreen: Success")
+            viewModel.dogStatus.value?.let { DogConten(dog = it) }
+        }
     }
 }
 
 @Composable
-fun ErrorDialog(status: UiStatus.Error<Any>, onErrorDialogDismiss:()->Unit){
-    AlertDialog(
-        onDismissRequest = { },
-        title = {
-        Text(stringResource(R.string.error_dialog_title))
-    },
-        confirmButton = {
-        TextButton(onClick = { onErrorDialogDismiss() }){
-            Text(text = stringResource(R.string.error_dialog_confirButton))
+fun DogConten(dog:Dog){
+    Log.d("TAG", "DogDetailScreen: $dog")
+        Box(
+            modifier = Modifier
+                .background(Color.Gray)
+                .fillMaxSize()
+                .padding(horizontal = 8.dp, vertical = 16.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            DogInformation(dog)
+            SubcomposeAsyncImage(
+                model = dog.imageUrl,
+                loading = {
+                    Box(contentAlignment = Alignment.Center){
+                        CircularProgressIndicator(modifier = Modifier
+                            .height(45.dp)
+                            .width(45.dp))
+                    }
+                },
+                contentDescription = "Dog image",
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(200.dp)
+                    .padding(top = 40.dp)
+            )
+
+
+            FloatingActionButton(
+                onClick = {
+                    //Agrega dog y navega
+                },
+                modifier = Modifier.align(Alignment.BottomCenter),
+                backgroundColor = Color.Blue
+            ) {
+                Icon(imageVector = Icons.Filled.Check, contentDescription = "")
+            }
+
+
+
         }
-    },
-        text = {
-            Text(status.message)
-        }
-    )
+
 }
 
 @Composable
-fun DogInformation(dog: Dog, status: UiStatus<Any>?) {
+fun DogInformation(dog: Dog) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,7 +132,7 @@ fun DogInformation(dog: Dog, status: UiStatus<Any>?) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    text = dog.name,
+                    text = dog.name.toString(),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Black,
@@ -142,7 +147,7 @@ fun DogInformation(dog: Dog, status: UiStatus<Any>?) {
                     textAlign = TextAlign.End
                 )
                 Text(
-                    modifier = Modifier.padding(8.dp), text = dog.temperament,
+                    modifier = Modifier.padding(8.dp), text = dog.temperament.toString(),
                     fontSize = 16.sp,
                     color = Color.Black,
                     fontWeight = FontWeight.Medium,
@@ -158,11 +163,6 @@ fun DogInformation(dog: Dog, status: UiStatus<Any>?) {
                     color = Color.Gray,
                     thickness = 1.dp
                 )
-                if(status is UiStatus.Loading){
-                    Box(contentAlignment = Alignment.Center){
-                        LinearProgressIndicator()
-                    }
-                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -175,7 +175,7 @@ fun DogInformation(dog: Dog, status: UiStatus<Any>?) {
                     ) {
                         Text(
                             modifier = Modifier.padding(8.dp),
-                            text = dog.type,
+                            text = dog.raza.toString(),
                             textAlign = TextAlign.Center,
                             color = Color.Black,
                             fontWeight = FontWeight.Medium,
@@ -227,8 +227,8 @@ fun ColumnDetail(sex: Sex, dog: Dog, modifier: Modifier = Modifier) {
         Text(
             modifier = Modifier.padding(8.dp),
             text = when (sex) {
-                Sex.Male -> dog.weightMale
-                Sex.Female -> dog.weightFemale
+                Sex.Male -> dog.weightMale.toString()
+                Sex.Female -> dog.weightFemale.toString()
             },
             textAlign = TextAlign.Center,
             color = Color.Black,
@@ -245,8 +245,8 @@ fun ColumnDetail(sex: Sex, dog: Dog, modifier: Modifier = Modifier) {
         Text(
             modifier = Modifier.padding(8.dp),
             text = when (sex) {
-                Sex.Male -> dog.heightFemale
-                Sex.Female -> dog.heightMale
+                Sex.Male -> dog.heightFemale.toString()
+                Sex.Female -> dog.heightMale.toString()
             },
             textAlign = TextAlign.Center,
             color = Color.Black,

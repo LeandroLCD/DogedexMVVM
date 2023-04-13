@@ -2,7 +2,7 @@ package com.leandrolcd.dogedexmvvm.core.camera
 
 import android.graphics.Bitmap
 import com.leandrolcd.dogedexmvvm.MAX_RECOGNITION_DOG_RESULTS
-import com.leandrolcd.dogedexmvvm.machinelearning.DogRecognition
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.common.TensorProcessor
 import org.tensorflow.lite.support.common.ops.DequantizeOp
