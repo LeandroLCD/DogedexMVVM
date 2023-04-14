@@ -17,10 +17,11 @@ class FireStoreService @Inject constructor(
     @SuppressLint("SuspiciousIndentation")
     suspend fun getDogListApp(): List<DogDTO> {
         val dogList = mutableListOf<DogDTO>()
-            fireStore.collection("DogListApp")
-                .orderBy("id", Query.Direction.ASCENDING)
+            val querySnapshot = fireStore.collection("DogListApp")
                 .get()
-                .addOnSuccessListener { querySnapshot ->
+                .await()
+
+                    Log.d("TAG", "getDogListApp: ${querySnapshot.documents}")
                     for (document in querySnapshot.documents) {
                         document.id
                         val dog = document.toObject<DogDTO>()
@@ -28,13 +29,6 @@ class FireStoreService @Inject constructor(
                             dogList.add(it)
                         }
                     }
-                }
-                .addOnFailureListener { exception ->
-                    Exception(exception)
-                }
-                .await()
-
-
 
         return dogList
     }

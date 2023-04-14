@@ -33,12 +33,13 @@ class FireStoreRepository @Inject constructor(
 
     override suspend fun getDogCollection(): UiStatus<List<Dog>> {
         return withContext(dispatcher) {
+            Log.d("TAG", "getDogCollection: fireStore")
             val allDogDeferred = async { getDogListApp() }
             val dogUserDeferred = async { getDogListUser() }
 
             val allDog = allDogDeferred.await()
             val dogUser = dogUserDeferred.await()
-
+            Log.d("TAG", "getDogCollection: alldog $allDog")
             if(allDog is UiStatus.Error){
                 allDog
             }

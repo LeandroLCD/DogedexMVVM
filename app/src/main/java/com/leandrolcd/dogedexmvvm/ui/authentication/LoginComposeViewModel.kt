@@ -4,6 +4,8 @@ import android.util.Patterns
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser
+import com.leandrolcd.dogedexmvvm.api.models.isNull
 import com.leandrolcd.dogedexmvvm.domain.AuthLoginUseCase
 import com.leandrolcd.dogedexmvvm.domain.AuthLoginWithGoogleUseCase
 import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
@@ -24,6 +26,8 @@ class LoginComposeViewModel @Inject constructor(
     var email = mutableStateOf<String>("")
     private set
 
+    var userCurrent = mutableStateOf<FirebaseUser?>(null)
+        private set
 
     var password = mutableStateOf("")
         private set
@@ -34,6 +38,10 @@ class LoginComposeViewModel @Inject constructor(
     var uiStatus = mutableStateOf<UiStatus<Any>>(UiStatus.Loaded())
     private set
     //endregion
+    init {
+        // Asegurarse de que userCurrent esté inicializado
+        chekedUserCurren()
+    }
 
     //region Methods
     fun onLoginChange(_email:String, pwd:String){
@@ -66,6 +74,14 @@ class LoginComposeViewModel @Inject constructor(
 
     fun onTryAgain() {
         uiStatus.value = UiStatus.Loaded()
+    }
+
+    private fun chekedUserCurren() {
+        // Asegurarse de que authLoginUseCase esté inicializado y que getUser() devuelva un objeto válido
+        authLoginUseCase?.getUser()?.let { user ->
+            userCurrent.value = user
+            uiStatus.value = UiStatus.Success(true)
+        }
     }
     //region
 

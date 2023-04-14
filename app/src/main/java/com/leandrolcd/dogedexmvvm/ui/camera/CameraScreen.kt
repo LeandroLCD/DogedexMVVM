@@ -1,10 +1,8 @@
 package com.leandrolcd.dogedexmvvm.ui.camera
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Build
 import android.view.Surface.*
-import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -27,12 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.ViewCompat.getDisplay
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.leandrolcd.dogedexmvvm.getCameraProvider
-import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
 import com.leandrolcd.dogedexmvvm.opacity
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
 import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.backGroudColor
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.primaryColor
@@ -106,7 +103,7 @@ fun MyScaffolf(
             MyFab(dogRecognition.confidence > 70) {
                 navigationController.navigate(Routes.ScreenDogDetail.routeName(
                     true,
-                    dogRecognition.id,
+                    dogRecognition.id
                 ))
             }
         },

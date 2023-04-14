@@ -1,5 +1,6 @@
 package com.leandrolcd.dogedexmvvm.ui.authentication.utilities
 
+import android.app.Activity
 import android.os.Build.VERSION.SDK_INT
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -10,11 +11,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.SyncProblem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Alignment.Companion.BottomCenter
@@ -33,6 +34,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import com.airbnb.lottie.compose.*
 import com.leandrolcd.dogedexmvvm.R
 import com.leandrolcd.dogedexmvvm.ui.authentication.LoginComposeViewModel
 import com.leandrolcd.dogedexmvvm.ui.model.Routes
@@ -59,13 +61,12 @@ fun LoginScreen(
             LoginContent(viewModel, navigationController, onLoginWithGoogleClicked)
         }
         is UiStatus.Loading -> {
-            GifScreen(R.drawable.ic_loading)
+            LoadingScreen()
         }
         is UiStatus.Success -> {
             LaunchedEffect(true) {
-                delay(1000)
                 navigationController.popBackStack()
-                navigationController.navigate(Routes.ScreamCamera.route)
+                navigationController.navigate(Routes.ScreenDogList.route)
             }
         }
     }
@@ -128,6 +129,9 @@ fun MyCardLogin(
     val configuration = LocalConfiguration.current
     val screenWidthDp = floor(configuration.screenWidthDp * 0.85).toInt()
     val screenHeightDp = floor(configuration.screenHeightDp * 0.96).toInt()
+    var isPlaying by remember {
+        mutableStateOf(true)
+    }
     Card(
         shape = RoundedCornerShape(topEnd = 30.dp, bottomEnd = 30.dp),
 
@@ -135,36 +139,70 @@ fun MyCardLogin(
             .width(screenWidthDp.dp)
             .height(screenHeightDp.dp)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_huellas),
-            contentDescription = "",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = floor(configuration.screenHeightDp * 0.3).toInt().dp),
-            alpha = 0.2f,
-        )
+
+        Huellas()
         Column(
             Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            MyHeader()
-            BodyLogin(viewModel)
-            FooterLogin(viewModel, navigationController, onLoginWithGoogleClicked)
+            HeaderLogin(Modifier.weight(1f), isPlaying){
+                isPlaying = false
+            }
+            BodyLogin(Modifier.weight(1f), viewModel){
+                Log.d("TAG", "isPlaying: true")
+                isPlaying = true
+            }
+            FooterLogin(Modifier.weight(1f), viewModel, navigationController, onLoginWithGoogleClicked)
         }
 
     }
 }
 
 @Composable
+fun HeaderLogin(modifier: Modifier, isPlaying: Boolean,stopPlaying:()->Unit) {
+    val activity = LocalContext.current as Activity
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
+        Row(modifier, horizontalArrangement = Arrangement.SpaceBetween) {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(
+                onClick = { activity.finish() }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "Exits App"
+                )
+            }
+
+
+        }
+
+
+        LogoAnimationView(isPlaying){
+            stopPlaying()
+        }
+
+
+
+    }
+}
+
+
+
+@Composable
 fun FooterLogin(
+    modifier: Modifier = Modifier,
     viewModel: LoginComposeViewModel,
     navigationController: NavHostController,
     onLoginWithGoogleClicked: () -> Unit
 ) {
     Box(contentAlignment = BottomCenter) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
@@ -174,7 +212,7 @@ fun FooterLogin(
             LoginWithGoogle(Modifier) {
                 onLoginWithGoogleClicked()
             }
-            SignUp(Modifier.weight(1f)) {
+            SignUp(Modifier) {
                 navigationController.navigate(Routes.ScreenSignUp.route)
             }
         }
@@ -183,23 +221,24 @@ fun FooterLogin(
 }
 
 @Composable
-fun BodyLogin(viewModel: LoginComposeViewModel) {
+fun BodyLogin(modifier: Modifier = Modifier, viewModel: LoginComposeViewModel,onComplete:()->Unit) {
     val email = viewModel.email.value
     val password = viewModel.password.value
 
     Column(
-        Modifier
+        modifier
             .padding(16.dp)
-            .fillMaxWidth()
     ) {
 
         EmailFields(
+            Modifier.fillMaxWidth(),
             label = "Email",
             text = email,
             icons = { MyIcon(Icons.Default.Email) },
             onValueChange = {
                 viewModel.onLoginChange(it, password)
-            }
+            },
+            onComplete = {onComplete()}
         )
         PasswordFields(
             label = "Password",
@@ -208,7 +247,9 @@ fun BodyLogin(viewModel: LoginComposeViewModel) {
             onValueChange = {
                 viewModel.onLoginChange(email, it)
             },
-            visualTransformation = PasswordVisualTransformation('*')
+            visualTransformation = PasswordVisualTransformation('*'),
+            onComplete = {onComplete()}
+
         )
         ForgotPassword(modifier = Modifier.align(Alignment.End))
     }
@@ -258,14 +299,14 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         modifier = modifier.padding(top = 32.dp)
     ) {
-        Row {
+        Row(Modifier.padding(vertical = 16.dp)) {
 
             MyDivider(
                 Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
                     .align(CenterVertically))
-            Text("Or")
+            Text("Continuar con")
             MyDivider(
                 Modifier
                     .weight(1f)
@@ -278,6 +319,7 @@ fun LoginWithGoogle(modifier: Modifier, onClickAction: () -> Unit) {
             modifier = modifier
                 .width(40.dp)
                 .height(40.dp)
+                .padding(bottom = 16.dp)
                 .clickable {
                     onClickAction()
                 }
@@ -317,7 +359,7 @@ fun SignUp(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Bottom
     ) {
-        Text("Don't have an account?", fontSize = 12.sp, color = Color.Gray)
+        Text("Don't have an account?", fontSize = 12.sp, color = Color.Black)
         Text(
             "Sign Up",
             Modifier
@@ -325,7 +367,7 @@ fun SignUp(
                 .clickable { onSignUpClicked() },
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF4Ea8E9)
+            color = primaryColor
         )
 
     }

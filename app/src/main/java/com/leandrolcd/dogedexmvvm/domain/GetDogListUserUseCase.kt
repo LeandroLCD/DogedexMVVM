@@ -1,5 +1,6 @@
 package com.leandrolcd.dogedexmvvm.domain
 
+import android.util.Log
 import com.leandrolcd.dogedexmvvm.api.models.toDogList
 import com.leandrolcd.dogedexmvvm.data.model.NetworkCallAnswer
 import com.leandrolcd.dogedexmvvm.data.repositoty.FireStoreRepository
@@ -12,6 +13,7 @@ class GetDogListUseCase @Inject constructor(
     private val repository: IFireStoreRepository
 ) {
     suspend operator fun invoke(): UiStatus<List<Dog>> {
+        Log.d("TAG", "invoke: Repository")
         return  repository.getDogCollection()        }
 
 }

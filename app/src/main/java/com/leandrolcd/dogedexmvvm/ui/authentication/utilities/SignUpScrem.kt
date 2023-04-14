@@ -13,8 +13,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.outlined.ArrowBackIos
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Key
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -35,12 +34,16 @@ import kotlin.math.floor
 
 
 @Composable
-fun SignUpScreen(navigationController: NavHostController, viewModel: SignUpViewModel = hiltViewModel()) {
+fun SignUpScreen(
+    navigationController: NavHostController,
+    viewModel: SignUpViewModel = hiltViewModel()
+) {
 
     when (val status = viewModel.uiStatus.value) {
         is UiStatus.Error -> TODO()
         is UiStatus.Loaded -> {
-            CardSignUp(viewModel, navigationController)
+
+             CardSignUp(viewModel, navigationController)
         }
         is UiStatus.Loading -> GifScreen(R.drawable.ic_loading)
         is UiStatus.Success -> {
@@ -77,103 +80,107 @@ fun CardSignUp(viewModel: SignUpViewModel, navigationController: NavHostControll
                 .height(screenHeightDp.dp)
         ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.ic_huellas),
-                contentDescription = "",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = floor(configuration.screenHeightDp * 0.3).toInt().dp),
-                alpha = 0.2f,
-            )
+            Huellas()
 
             Column(
                 Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
             ) {
-                Row {
-                    IconButton(onClick = { navigationController.navigate(Routes.ScreenLogin.route) }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowBackIos,
-                            contentDescription = "Back to Login"
-                        )
-                    }
-                    MyHeader()
-                }
 
-                MyBody(viewModel)
-                MyFooter(viewModel)
+                MyHeader(Modifier.weight(1f),  navigationController)
+                MyBody(viewModel, Modifier.weight(1f))
+                MyFooter(viewModel, Modifier.weight(1f))
             }
 
         }
     }
 }
 
+
 @Composable
-fun MyFooter(viewModel: SignUpViewModel) {
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+fun MyFooter(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         MyButton("Sign Up", viewModel.isButtonEnabled.value) { viewModel.onSignUpClicked() }
     }
 }
 
 
 @Composable
-fun MyBody(viewModel: SignUpViewModel) {
+fun MyBody(viewModel: SignUpViewModel, modifier: Modifier = Modifier) {
     Column(
-        Modifier
+        modifier
             .padding(16.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(), verticalArrangement = Arrangement.Center
     ) {
         val email = viewModel.email.value
         val password = viewModel.password.value
         val passwordConfirmation = viewModel.passwordConfirmation.value
+        var isPlaying by remember {
+            mutableStateOf(true)
+        }
         EmailFields(
             label = "Email",
             text = email,
             icons = { MyIcon(Icons.Default.Email) },
-            onValueChange = { viewModel.onSignUpChanged(it, password, passwordConfirmation) })
+            onValueChange = { viewModel.onSignUpChanged(it, password, passwordConfirmation) },
+        onComplete = {isPlaying = false})
         PasswordFields(
             label = "Password",
             text = password,
             icons = { MyIcon(Icons.Outlined.Key) },
             onValueChange = { viewModel.onSignUpChanged(email, it, passwordConfirmation) },
             action = ImeAction.Next,
-            visualTransformation = PasswordVisualTransformation('*')
+            visualTransformation = PasswordVisualTransformation('*'),
+            onComplete = {isPlaying = false}
         )
         PasswordFields(
             label = "Confirm Password",
             text = passwordConfirmation,
             icons = { MyIcon(Icons.Outlined.Key) },
             onValueChange = { viewModel.onSignUpChanged(email, password, it) },
-            visualTransformation = PasswordVisualTransformation('*')
+            visualTransformation = PasswordVisualTransformation('*'),
+            onComplete = {isPlaying = false}
         )
     }
 }
 
 
 @Composable
-fun MyHeader() {
+fun MyHeader(modifier: Modifier = Modifier, navigationController: NavHostController) {
     val activity = LocalContext.current as Activity
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(200.dp)
     ) {
+        Row(modifier) {
+            IconButton(
+                onClick = { navigationController.navigate(Routes.ScreenLogin.route) }) {
+                Icon(
+                    imageVector = Icons.Outlined.ArrowBackIos,
+                    contentDescription = "Back to Login"
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(
+                onClick = { activity.finish() }
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "Exits App"
+                )
+            }
+
+        }
         Image(
             painter = painterResource(id = R.drawable.ic_logo),
             contentDescription = "Icon",
             modifier = Modifier
                 .fillMaxSize()
         )
-        IconButton(
-            onClick = { activity.finish() }, Modifier
-                .align(Alignment.TopEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = "Exits App"
-            )
-        }
+
 
     }
 }
