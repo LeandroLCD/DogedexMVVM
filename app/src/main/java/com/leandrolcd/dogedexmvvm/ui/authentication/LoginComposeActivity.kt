@@ -1,8 +1,6 @@
 package com.leandrolcd.dogedexmvvm.ui.authentication
 
 import android.content.Intent
-import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,8 +17,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,12 +27,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.leandrolcd.dogedexmvvm.R
-import com.leandrolcd.dogedexmvvm.ui.doglist.DogListScreen
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.LoginScreen
-import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.SignUpScreen
 import com.leandrolcd.dogedexmvvm.ui.authentication.utilities.StartScreen
 import com.leandrolcd.dogedexmvvm.ui.dogdetail.DogDetailScreen
+import com.leandrolcd.dogedexmvvm.ui.doglist.DogListScreen
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
+import com.leandrolcd.dogedexmvvm.ui.model.Routes
 import com.leandrolcd.dogedexmvvm.ui.ui.theme.DogedexMVVMTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,24 +43,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LoginComposeActivity : ComponentActivity() {
 
-
     private val loginViewModel: LoginComposeViewModel by viewModels()
-
-    private val requiredPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            Log.i("tag", "permiso consedido")
-        } else {
-            Log.i("tag", "permisno denegado")
-        }
-
-    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         setContent {
             DogedexMVVMTheme {
                 // A surface container using the 'background' color from the theme
@@ -76,7 +61,6 @@ class LoginComposeActivity : ComponentActivity() {
                 }
             }
         }
-        requestCameraPermission()
     }
 
 
@@ -90,51 +74,42 @@ class LoginComposeActivity : ComponentActivity() {
             composable(route = Routes.ScreenLoading.route) {
                 StartScreen(navigationController)
             }
+
             composable(route = Routes.ScreenLogin.route) {
                 LoginScreen(navigationController, viewModel = loginViewModel){
                     onLoginWithGoogleClicked()
                 }
             }
+
             composable(route = Routes.ScreenSignUp.route) { SignUpScreen(navigationController) }
 
             composable(route = Routes.ScreenDogList.route) { DogListScreen(navigationController) }
 
 
             composable(
-                Routes.ScreenDogDetail.route,
-                arguments = listOf(navArgument("isRecognition") { type = NavType.BoolType },
-                    navArgument("dogId") { defaultValue = "" })
-            ) {
-                    backStackEntry ->
-                DogDetailScreen(
-                    navigationController = navigationController,
-                    backStackEntry.arguments?.getBoolean("isRecognition", false)!!,
-                    backStackEntry.arguments?.getString("dogId")!!
+                route = Routes.ScreenDogDetail.route,
+                arguments = listOf(
+                    navArgument("isRecognition") { type = NavType.BoolType },
+                    navArgument("dogList") { type = NavType.StringType }
                 )
+            ) { backStackEntry ->
+                val isRecognition = backStackEntry.arguments?.getBoolean("isRecognition") ?: false
+                val dogListString = backStackEntry.arguments?.getString("dogList") ?: ""
+                val dogList = dogListString.split(",").map {
+                    val (id, confidence) = it.split(":")
+                    DogRecognition(id, confidence.toFloat())
+                }
+                DogDetailScreen(navController = navigationController, isRecognition = isRecognition, dogList = dogList)
             }
+
+
         }
 
     }
 
 
     //endregion
-    private fun requestCameraPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.i("TAG", "requestCameraPermission: permiso otorgado")
-            }
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                android.Manifest.permission.CAMERA
-            ) -> Log.i("tag", "requestCameraPermission: Show permission")
 
-            else -> requiredPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-        }
-
-    }
     private fun onLoginWithGoogleClicked() {
 
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

@@ -5,11 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
-import com.leandrolcd.dogedexmvvm.api.models.isNull
 import com.leandrolcd.dogedexmvvm.domain.AuthLoginUseCase
 import com.leandrolcd.dogedexmvvm.domain.AuthLoginWithGoogleUseCase
-import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import com.leandrolcd.dogedexmvvm.ui.model.LoginUser
+import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -78,7 +77,7 @@ class LoginComposeViewModel @Inject constructor(
 
     private fun chekedUserCurren() {
         // Asegurarse de que authLoginUseCase esté inicializado y que getUser() devuelva un objeto válido
-        authLoginUseCase?.getUser()?.let { user ->
+        authLoginUseCase.getUser()?.let { user ->
             userCurrent.value = user
             uiStatus.value = UiStatus.Success(true)
         }

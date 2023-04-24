@@ -20,6 +20,7 @@
         <activity
             android:name=".ui.authentication.LoginComposeActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.DogedexMVVM">
 
             <intent-filter>

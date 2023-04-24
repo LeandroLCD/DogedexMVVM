@@ -1,87 +1,105 @@
 package com.leandrolcd.dogedexmvvm.data.repositoty
 
-import android.util.Log
+import android.content.Context
 import com.leandrolcd.dogedexmvvm.api.makeNetworkCall
-import com.leandrolcd.dogedexmvvm.api.makeNetworkCallAnswer
-import com.leandrolcd.dogedexmvvm.api.models.toDog
-import com.leandrolcd.dogedexmvvm.api.models.toDogList
 import com.leandrolcd.dogedexmvvm.data.model.DogDTO
-import com.leandrolcd.dogedexmvvm.data.model.NetworkCallAnswer
 import com.leandrolcd.dogedexmvvm.data.network.FireStoreService
+import com.leandrolcd.dogedexmvvm.isNetworkConnected
+import com.leandrolcd.dogedexmvvm.toDog
+import com.leandrolcd.dogedexmvvm.toDogList
 import com.leandrolcd.dogedexmvvm.ui.model.Dog
+import com.leandrolcd.dogedexmvvm.ui.model.DogRecognition
 import com.leandrolcd.dogedexmvvm.ui.model.UiStatus
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.floor
+
 interface IFireStoreRepository{
     suspend fun addDogToUser(dogId: String): UiStatus<Boolean>
-    suspend fun getDogCollection(): UiStatus<List<Dog>>
+    suspend fun getDogCollection(): List<Dog>
     suspend fun getDogById(id:String):UiStatus<Dog>
+    suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>>
 }
 
 class FireStoreRepository @Inject constructor(
     private val fireStore: FireStoreService,
+    private val context: Context,
     private val dispatcher: CoroutineDispatcher):IFireStoreRepository {
-    override suspend fun addDogToUser(dogId: String): UiStatus<Boolean> {
-        return makeNetworkCall(dispatcher) {
-            fireStore.addDogDTOToUser(dogId)
-        }
+
+    companion object{
+        private lateinit var dogCollection:List<Dog>
+        private var dogListApp: MutableList<DogDTO> = mutableListOf()
+        private var dogIdUser: MutableList<String> = mutableListOf()
 
     }
+    override suspend fun addDogToUser(dogId: String): UiStatus<Boolean> {
+        return makeNetworkCall(dispatcher) {
+            if (!isNetworkConnected(context)) {
+                throw Exception("El dispositivo no cuenta con conexión a internet")
+            }
+            val resp = fireStore.addDogIdToUser(dogId)
+            if (resp) {
+                dogIdUser.add(dogId)
+            }
+            resp
+        }
+    }
 
-    override suspend fun getDogCollection(): UiStatus<List<Dog>> {
+    override suspend fun getDogCollection(): List<Dog> {
+
         return withContext(dispatcher) {
-            Log.d("TAG", "getDogCollection: fireStore")
-            val allDogDeferred = async { getDogListApp() }
-            val dogUserDeferred = async { getDogListUser() }
 
-            val allDog = allDogDeferred.await()
-            val dogUser = dogUserDeferred.await()
-            Log.d("TAG", "getDogCollection: alldog $allDog")
-            if(allDog is UiStatus.Error){
-                allDog
-            }
-            if(dogUser is UiStatus.Error){
-                dogUser
-            }
-            if(allDog is UiStatus.Success && dogUser is UiStatus.Success){
-                UiStatus.Success(getCollectionList(allDog.data, dogUser.data))
-            }
-            else{
-                UiStatus.Error("Error desconocido")
+            if (dogListApp.isEmpty()){
+                val dogUserDeferred = async { fireStore.getDogListUser() }
+                val allDogDeferred = async { fireStore.getDogListApp() }
+
+                val dogUser = dogUserDeferred.await()
+                val dogApp = allDogDeferred.await()
+                dogListApp.addAll(dogApp)
+                dogIdUser.addAll(dogUser)
+                dogCollection = getCollectionList(dogApp, dogUser)
+            }else{
+                dogCollection = getCollectionList(dogListApp, dogIdUser)
             }
 
-
-
+            dogCollection
         }
     }
     override suspend fun getDogById(id:String):UiStatus<Dog>{
         return makeNetworkCall(dispatcher) {
+            if (!isNetworkConnected(context)) {
+                throw Exception("El dispositivo no cuenta con conexión a internet")
+            }
             fireStore.getDogById(id).toDog()
         }
     }
-    private suspend fun getDogListApp(): UiStatus<List<DogDTO>> {
+    override suspend fun getDogsByIds(list: List<DogRecognition>): UiStatus<List<Dog>> {
         return makeNetworkCall(dispatcher) {
-            fireStore.getDogListApp()
+            if (!isNetworkConnected(context)) {
+                throw Exception("El dispositivo no cuenta con conexión a internet")
+            }
+            if (dogListApp.isEmpty()){
+                fireStore.getDogsByIds(list.map { it.id }).toDogList()
+            }
+            val filteredDogs = dogListApp.toDogList().filter { list.map { r -> r.id }.contains(it.mlId) }
+           filteredDogs.map {
+                it.confidence = floor( list.find { r-> r.id == it.mlId }?.confidence ?: 0f)
+               it
+            }
+
         }
     }
-
-    private suspend fun getDogListUser(): UiStatus<List<String>> {
-        return makeNetworkCall(dispatcher) {
-            fireStore.getDogListUser()
-        }
-    }
-
     private fun getCollectionList(allDogList: List<DogDTO>, userDogList: List<String>): List<Dog> {
-        return allDogList.toDogList().map {
-            if (userDogList.contains(it.id)) {
+        val dog = allDogList.toDogList().map {
+            if (userDogList.contains(it.mlId)) {
                 it.inCollection = true
                 it
             } else {
-                Dog(mlId = it.id, index = it.index)
+                Dog(mlId = it.mlId, index = it.index)
             }
-        }.sorted()
+        }.sorted().sortedBy { it.index }
+        return dog
     }
 }

@@ -89,22 +89,19 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
 
-    //navegar entre fragment
-    implementation 'androidx.navigation:navigation-fragment:2.5.3'
-    implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
 
-    implementation "androidx.navigation:navigation-compose:2.5.3"
 
     // dowload image
     implementation "io.coil-kt:coil:2.3.0"
     implementation "io.coil-kt:coil-gif:2.2.2"
+
     //libreria de iconos
-    implementation 'androidx.compose.material:material:1.4.1'
-    implementation "androidx.compose.material:material-icons-extended:1.4.1"
+    implementation 'androidx.compose.material:material:1.4.2'
+    implementation "androidx.compose.material:material-icons-extended:1.4.2"
 
     //async and viewModel
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation "androidx.compose.runtime:runtime-livedata:1.4.1"
+    implementation "androidx.compose.runtime:runtime-livedata:1.4.2"
 
     //region Animation
     implementation "com.airbnb.android:lottie-compose:4.0.0"
@@ -127,6 +124,10 @@ dependencies {
     implementation composeBom
     androidTestImplementation composeBom
 
+
+    implementation "androidx.navigation:navigation-compose:2.5.3"
+    implementation 'androidx.constraintlayout:constraintlayout-compose:1.0.1'
+
     implementation 'androidx.compose.material3:material3'
 
     implementation 'androidx.compose.material:material'
@@ -137,10 +138,9 @@ dependencies {
 
 
     implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation'androidx.compose.foundation:foundation:1.4.1'
     debugImplementation 'androidx.compose.ui:ui-tooling'
     // Optional - Integration with activities
-    implementation 'androidx.activity:activity-compose:1.7.0'
+    implementation 'androidx.activity:activity-compose:1.7.1'
 
     // UI Tests
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
@@ -174,7 +174,7 @@ dependencies {
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
     // endregion
 
-    implementation 'androidx.activity:activity-ktx:1.7.0'
+    implementation 'androidx.activity:activity-ktx:1.7.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

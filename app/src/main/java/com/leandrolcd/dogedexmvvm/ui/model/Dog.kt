@@ -1,24 +1,55 @@
 package com.leandrolcd.dogedexmvvm.ui.model
 
 import android.os.Parcelable
+import com.google.firebase.firestore.Exclude
+import com.google.gson.annotations.SerializedName
+
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Dog(
-    var id: String = "",
+    @SerializedName("mlId")
+    var mlId: String = "",
+    @SerializedName("curiosities")
+    val curiosities: String = "",
+    @SerializedName("curiositiesEs")
+    val curiositiesEs: String = "",
+    @SerializedName("heightFemale")
+    val heightFemale: String = "",
+    @SerializedName("heightMale")
+    val heightMale: String = "",
+    @SerializedName("heightFemaleEs")
+    val heightFemaleEs: String = "",
+    @SerializedName("heightMaleEs")
+    val heightMaleEs: String = "",
+    @SerializedName("imageUrl")
+    val imageUrl: String = "",
+    @SerializedName("index")
     val index: Int,
-    val raza           : String = "",
-    val heightFemale   : String = "",
-    val heightMale     : String = "",
-    val imageUrl       : String = "",
-    val lifeExpectancy : String = "",
-    val name           : String = "",
-    val curiosities    : String = "",
-    val temperament    : String = "",
-    val weightFemale   : String = "",
-    val weightMale     : String = "",
-    val mlId           : String = "",
-    var inCollection:Boolean = false
+    @SerializedName("lifeExpectancy")
+    val lifeExpectancy: String = "",
+    @SerializedName("name")
+    val name: String = "",
+    @SerializedName("race")
+    val race: String = "",
+    @SerializedName("raceEs")
+    val raceEs: String = "",
+    @SerializedName("temperament")
+    val temperament: String = "",
+    @SerializedName("temperamentEs")
+    val temperamentEs: String = "",
+    @SerializedName("weightFemale")
+    val weightFemale: String = "",
+    @SerializedName("weightMale")
+    val weightMale: String = "",
+    @SerializedName("weightFemaleEs")
+    val weightFemaleEs: String = "",
+    @SerializedName("weightMaleEs")
+    val weightMaleEs: String = "",
+    @Exclude
+    var inCollection:Boolean = false,
+    @Exclude
+    var confidence:Float = 0f
 
 ) : Parcelable, Comparable<Dog>{
     override fun compareTo(other: Dog): Int = if (this.mlId != other.mlId) 1 else -1

@@ -7,8 +7,9 @@ sealed class Routes(val route:String) {
 
     object ScreenCamera: Routes("CameraScreen")
     object ScreenDogList: Routes("DogListScreen")
-    object ScreenDogDetail: Routes("DogDetailScreen/{dogId}/{isRecognition}"){
-        fun routeName(isRecognition: Boolean, dogId:String) = "DogDetailScreen/$dogId/$isRecognition"
+    object ScreenDogDetail: Routes("DogDetailScreen/{isRecognition}/{dogList}") {
+        fun routeName(isRecognition: Boolean, dogList: List<DogRecognition>) =
+            "DogDetailScreen/$isRecognition/${dogList.joinToString(",") { "${it.id}:${it.confidence}" }}"
     }
     object ScreamCamera: Routes("CameraScream")
 }
